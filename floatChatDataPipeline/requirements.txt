@@ -1,0 +1,14 @@
+# Data Handling
+pandas
+xarray
+netcdf4
+
+# Database
+psycopg2-binary
+
+# Vector Store & AI
+faiss-cpu
+sentence-transformers
+
+# Configuration
+python-dotenv
