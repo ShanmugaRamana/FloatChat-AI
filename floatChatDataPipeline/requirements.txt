@@ -1,0 +1,16 @@
+# For data reading and processing
+xarray
+netcdf4
+pandas
+
+# For PostgreSQL database connection
+SQLAlchemy
+psycopg2-binary
+
+# For vector database and embeddings
+chromadb
+sentence-transformers
+faiss-cpu
+
+# For configuration management
+python-dotenv

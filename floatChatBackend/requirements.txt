@@ -1,0 +1,19 @@
+# --- Core Web Framework & Server ---
+fastapi
+uvicorn[standard]
+
+# --- Database & ORM for PostgreSQL ---
+sqlalchemy
+psycopg2-binary
+
+# --- Vector Search, Embeddings & AI ---
+chromadb
+faiss-cpu
+sentence-transformers
+numpy
+
+# --- HTTP Client for OpenRouter API ---
+httpx
+
+# --- Configuration Management ---
+python-dotenv

@@ -1,6 +1,7 @@
 venv
 __pycache__
 output
-NetCDFDataFiles
+NetCDFDataFile
 logs
 .env
+chroma_data
