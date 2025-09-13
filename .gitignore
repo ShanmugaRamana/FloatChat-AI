@@ -5,3 +5,4 @@ NetCDFDataFile
 logs
 .env
 chroma_data
+node_modules
