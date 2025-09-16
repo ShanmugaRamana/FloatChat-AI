@@ -5,11 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Your Signup</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <div class="form-container">
         <h2>Welcome, <%= username %>!</h2>
         <p>Your email (<%= email %>) is confirmed. Please create a password to complete your floatChat account.</p>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+
         <form action="/auth/google/complete" method="POST">
             <div class="form-group">
                 <label for="password">Password</label>

@@ -27,39 +27,43 @@ router.get('/google/callback',
 );
 
 // Route to display the password creation page
-router.get('/google/complete', (req, res) => {
-    if (!req.session.googleProfile) {
-        return res.redirect('/signup');
-    }
-    res.render('complete-google-signup', {
-        username: req.session.googleProfile.username,
-        email: req.session.googleProfile.email
-    });
-});
-
-// Route to handle the password form submission
 router.post('/google/complete', async (req, res) => {
     if (!req.session.googleProfile) {
         return res.redirect('/signup');
     }
 
-    const { password } = req.body;
+    const { password, 'confirm-password': confirmPassword } = req.body;
     const { username, email, isVerified } = req.session.googleProfile;
+
+    // 1. Add password confirmation check
+    if (password !== confirmPassword) {
+        return res.render('complete-google-signup', {
+            username, email,
+            error: 'Passwords do not match. Please try again.' // Pass error message
+        });
+    }
 
     try {
         const newUser = new User({ username, email, password, isVerified });
         await newUser.save();
 
-        // Clear the temporary session data
         req.session.googleProfile = null;
 
-        // Log the new user in
         req.login(newUser, (err) => {
             if (err) throw err;
             res.redirect('/home');
         });
     } catch (error) {
-        console.error(error);
+        // 2. Add specific check for duplicate user error
+        if (error.code === 11000) {
+            // MongoDB duplicate key error
+            return res.render('complete-google-signup', {
+                username, email,
+                error: 'A user with that email or username already exists.'
+            });
+        }
+        // For any other errors
+        console.error("Error completing Google signup:", error);
         res.redirect('/signup');
     }
 });
