@@ -1,159 +1,130 @@
-/* --- CSS Variables for Easy Theming --- */
-:root {
-    --bg-color: #f4f6f8;
-    --card-bg-color: #ffffff;
-    --font-color: #333;
-    --primary-color: #007bff;
-    --user-msg-bg: #007bff;
-    --assistant-msg-bg: #e9ecef;
-    --border-color: #dee2e6;
-    --body-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+/* public/css/style.css */
 
-/* --- General Body & Layout Styles --- */
-body {
-    font-family: var(--body-font);
-    background-color: var(--bg-color);
-    color: var(--font-color);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-main {
-    flex-grow: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Prevents main from causing a scrollbar */
-}
-
-/* --- Header & Navigation --- */
-header {
-    background-color: var(--card-bg-color);
-    border-bottom: 1px solid var(--border-color);
-    padding: 0 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    flex-shrink: 0; /* Prevent header from shrinking */
-}
-
-nav {
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-nav h1 {
-    font-size: 1.5em;
-    color: var(--primary-color);
-}
-
-/* --- Chat Interface Styles --- */
-.chat-container {
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    height: 100%; /* Ensure it takes up the available space in main */
-}
-
-#chat-log {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 20px;
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.message {
-    margin-bottom: 15px;
-    padding: 10px 15px;
-    border-radius: 18px;
-    max-width: 80%;
-    line-height: 1.5;
-}
-
-.message p {
+    height: 100vh;
     margin: 0;
 }
-
-.user-message {
-    background-color: var(--user-msg-bg);
+.welcome-container {
+    width: 100%;
+    max-width: 700px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+header {
+    padding: 20px;
+    background-color: #0077b6;
     color: white;
-    align-self: flex-end; /* Aligns user messages to the right */
-}
-
-.assistant-message {
-    background-color: var(--assistant-msg-bg);
-    color: var(--font-color);
-    align-self: flex-start; /* Aligns assistant messages to the left */
-}
-
-.assistant-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-#chat-form {
     display: flex;
-    gap: 10px;
-    flex-shrink: 0; /* Prevent form from shrinking */
+    justify-content: space-between;
+    align-items: center;
 }
-
-#chat-input {
-    flex-grow: 1;
-    padding: 12px 20px;
-    border: 1px solid var(--border-color);
-    border-radius: 25px;
-    font-size: 1em;
-    outline: none;
+.header-title p {
+    margin: 0;
+    opacity: 0.9;
 }
-#chat-input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+header h1 { 
+    margin: 0; 
+    font-size: 1.5em; 
 }
-
-#chat-form button {
-    padding: 12px 25px;
-    border: none;
-    background-color: var(--primary-color);
+.auth-buttons .button {
     color: white;
-    border-radius: 25px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border: 1px solid white;
+    border-radius: 6px;
+    margin-left: 10px;
+    transition: background-color 0.2s, color 0.2s;
+}
+.auth-buttons .button:hover {
+    background-color: white;
+    color: #0077b6;
+}
+/* public/css/style.css */
+
+/* --- ADD THESE STYLES AT THE END --- */
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.form-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box; /* Important for padding */
     font-size: 1em;
-    font-weight: 500;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background-color: #0077b6;
+    color: white;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 10px;
 }
 
-#chat-form button:hover {
-    background-color: #0056b3;
-}
-/* --- Thinking Indicator Styles --- */
-.thinking-indicator span {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #868e96;
-    margin: 0 2px;
-    animation: bounce 1.4s infinite ease-in-out both;
+.divider {
+    margin: 20px 0;
+    font-weight: 600;
+    color: #aaa;
 }
 
-.thinking-indicator span:nth-child(1) { animation-delay: -0.32s; }
-.thinking-indicator span:nth-child(2) { animation-delay: -0.16s; }
+.btn-google {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+}
 
-@keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1.0); }
+.form-link {
+    margin-top: 20px;
+}
+
+.form-link a {
+    color: #0077b6;
+    text-decoration: none;
+    font-weight: 600;
 }

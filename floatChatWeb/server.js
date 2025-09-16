@@ -1,30 +1,43 @@
-// --- 1. Import Dependencies ---
+// server.js
 const express = require('express');
 const path = require('path');
-// dotenv loads environment variables from the .env file
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const passport = require('passport'); // <-- Import Passport
 require('dotenv').config();
 
-// --- 2. Initialize the Express App ---
-const app = express();
-// Set the port from the .env file, with a fallback to 3000
-const PORT = process.env.PORT || 3000;
+// Import configurations and routes
+const connectDB = require('./config/db');
+require('./config/passport-setup'); // <-- IMPORTANT: Run the passport config
+const authRoutes = require('./routes/authRoutes');
+const googleAuthRoutes = require('./routes/googleAuthRoutes'); // <-- Import Google routes
 
-// --- 3. Configure Middleware & Templating Engine ---
-// Set EJS as the view (template) engine
+connectDB();
+
+const app = express();
+const PORT = 3000;
+
 app.set('view engine', 'ejs');
-// Tell Express where to find the template files (in the 'views' directory)
 app.set('views', path.join(__dirname, 'views'));
 
-// Tell Express to serve static files (CSS, client-side JS) from the 'public' directory
+// --- Global Middleware ---
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// --- 4. Import and Use Routes ---
-// Import the routes defined in routes/index.js
-const indexRoutes = require('./routes/index');
-// Tell the app to use these routes for any incoming requests
-app.use('/', indexRoutes);
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
+}));
 
-// --- 5. Start the Server ---
-app.listen(PORT, () => {
-    console.log(`🚀 FloatChatWeb server is running on http://localhost:${PORT}`);
-});
+// --- Passport Middleware ---
+app.use(passport.initialize());
+app.use(passport.session()); // Allows persistent login sessions
+
+// --- Mount Routers ---
+app.use('/', authRoutes);
+app.use('/auth', googleAuthRoutes); // <-- Mount Google auth routes
+
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

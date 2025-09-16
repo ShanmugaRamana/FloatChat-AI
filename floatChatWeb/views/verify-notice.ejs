@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Your Email</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Verification Required</h2>
+        <p>We've sent a verification link to your email address. Please click the link to activate your account.</p>
+        
+        <div class="divider"></div>
+
+        <p style="margin-bottom: 15px;">Didn't receive the email?</p>
+        
+        <form action="/resend-verification" method="POST">
+             <div class="form-group">
+                <label for="email" style="text-align: left;">Enter your email to resend the link</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit" class="btn-primary">Resend Email</button>
+        </form>
+
+        <div class="form-link">
+             <a href="/login">Back to Login</a>
+        </div>
+    </div>
+</body>
+</html>

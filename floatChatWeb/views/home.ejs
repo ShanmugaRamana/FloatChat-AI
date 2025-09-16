@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - floatChat</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="welcome-container">
+         <header>
+            <div class="header-title">
+                <h1>Welcome, <%= user.username %>!</h1>
+            </div>
+            <div class="auth-buttons">
+                <form action="/logout" method="POST" style="margin: 0;">
+                    <button type="submit" class="button">Logout</button>
+                </form>
+            </div>
+        </header>
+        <div style="padding: 20px;">
+            <p>You are successfully logged in. The chat functionality will be here.</p>
+        </div>
+    </div>
+</body>
+</html>
