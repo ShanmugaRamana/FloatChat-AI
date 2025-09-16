@@ -22,26 +22,25 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
         try {
-            // Check if user already exists
             let user = await User.findOne({ email: profile.emails[0].value });
 
             if (user) {
-                // User exists, log them in
+                // LOGGING: See if an existing user was found
+                console.log('✅ Existing user found in DB:', user.email);
                 return done(null, user);
             } else {
-                // User does not exist, this is their first time signing up with Google.
-                // We need to ask them for a password.
-                // Store Google profile in session temporarily.
+                // LOGGING: Confirm that a new user is being processed
+                console.log('- - -> New user detected. Redirecting to complete signup for:', profile.emails[0].value);
+                
                 req.session.googleProfile = {
                     username: profile.displayName,
                     email: profile.emails[0].value,
-                    isVerified: true // Google emails are already verified
+                    isVerified: true
                 };
-                // Redirect to a page to complete signup by adding a password.
-                // We pass 'false' for the user since they aren't created yet.
                 return done(null, false, { message: 'COMPLETE_SIGNUP' });
             }
         } catch (error) {
+            console.error('Error in Google Strategy:', error);
             return done(error, false);
         }
     })

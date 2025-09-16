@@ -13,11 +13,14 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
+        // LOGGING: Check the message from Passport
+        console.log('▶️ Google callback executed. Auth Info:', req.authInfo);
+
         if (req.authInfo && req.authInfo.message === 'COMPLETE_SIGNUP') {
-            // If Passport strategy indicated a new user, redirect to complete signup
+            console.log('- - -> Redirecting to /auth/google/complete');
             res.redirect('/auth/google/complete');
         } else {
-            // Existing user, logged in successfully
+            console.log('✅ Redirecting to /home');
             res.redirect('/home');
         }
     }
