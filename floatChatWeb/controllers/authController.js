@@ -132,7 +132,9 @@ exports.showSamuduraPage = async (req, res) => {
         if (!user) return res.redirect('/login');
         res.render('samudura', {
             title: 'Samudura - floatChat',
-            user: user
+            user: user,
+            backendApiUrl: process.env.BACKEND_API_URL 
+
         });
     } catch (error) {
         res.redirect('/login');
