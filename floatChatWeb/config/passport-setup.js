@@ -1,13 +1,23 @@
+// config/passport-setup.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    // Handle temporary Google users
+    if (user.isNewGoogleUser) {
+        return done(null, 'temp_google_user');
+    }
+    done(null, user._id || user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
     try {
+        // Handle temporary Google users
+        if (id === 'temp_google_user') {
+            return done(null, { _id: 'temp_google_user', isNewGoogleUser: true });
+        }
+        
         const user = await User.findById(id);
         done(null, user);
     } catch (error) {
@@ -32,23 +42,24 @@ passport.use(
                 console.log('✅ Existing user found in DB:', user.email);
                 return done(null, user);
             } else {
-                console.log('➕ New user - storing in session:', profile.emails[0].value);
+                console.log('➕ New user detected. Setting up for signup completion:', profile.emails[0].value);
                 
-                // Store the profile in session for new users
-                req.session.pendingGoogleUser = {
+                // Store Google profile data in session for later use
+                req.session.googleProfile = {
                     username: profile.displayName,
                     email: profile.emails[0].value,
-                    isVerified: true
-                };
-
-                // Create a temporary user object to satisfy passport
-                const tempUser = {
-                    _id: 'temp_google_user',
-                    isNewGoogleUser: true,
-                    email: profile.emails[0].value
+                    isVerified: true // Google users are pre-verified
                 };
                 
-                return done(null, tempUser);
+                // Save the session before proceeding
+                req.session.save((err) => {
+                    if (err) {
+                        console.error('❌ Session save error:', err);
+                        return done(err, false);
+                    }
+                    console.log('✅ Session saved with Google profile');
+                    return done(null, false, { message: 'COMPLETE_SIGNUP' });
+                });
             }
         } catch (error) {
             console.error('❌ Error in Google Strategy:', error);
