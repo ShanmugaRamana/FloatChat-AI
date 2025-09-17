@@ -1,9 +1,9 @@
+// public/js/chat.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
     const chatBox = document.getElementById('chat-box');
-
-    // --- NEW: Create a Showdown converter instance ---
     const converter = new showdown.Converter();
 
     chatForm.addEventListener('submit', async (event) => {
@@ -48,22 +48,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const messageP = document.createElement('p');
 
-        // --- MODIFIED: Use the converter for bot messages ---
         if (className.includes('bot-message')) {
-            const html = converter.makeHtml(text); // Convert Markdown to HTML
-            messageP.innerHTML = html; // Use innerHTML to render the formatting
+            const html = converter.makeHtml(text);
+        
+            messageP.innerHTML = html;
         } else {
-            messageP.textContent = text; // User messages are still plain text
+            messageP.textContent = text;
         }
 
         messageDiv.appendChild(messageP);
         chatBox.appendChild(messageDiv);
-        scrollToBottom();
+        
+        // --- MODIFIED: Use scrollIntoView on the new message ---
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        
         return messageDiv;
     }
 
     function showLoadingIndicator() {
-        // ... (this function is unchanged)
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', 'bot-message');
         const indicatorDiv = document.createElement('div');
@@ -71,11 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         indicatorDiv.innerHTML = '<span></span><span></span><span></span>';
         messageDiv.appendChild(indicatorDiv);
         chatBox.appendChild(messageDiv);
-        scrollToBottom();
+        
+        // --- MODIFIED: Use scrollIntoView on the loading indicator ---
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
         return messageDiv;
     }
 
-    function scrollToBottom() {
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    // The old scrollToBottom function is no longer needed and can be deleted.
 });
