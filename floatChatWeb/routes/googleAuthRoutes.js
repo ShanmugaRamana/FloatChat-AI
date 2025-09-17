@@ -13,23 +13,24 @@ router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
         console.log('▶️ Google callback executed');
-        console.log('User object:', req.user);
+        console.log('📊 User object:', JSON.stringify(req.user, null, 2));
+        console.log('📊 Session pendingGoogleUser:', req.session.pendingGoogleUser);
         
-        // Check if this is a new Google user
-        if (req.user && req.user.isNewGoogleUser) {
-            console.log('➕ New Google user - redirecting to complete signup');
+        // Check if this is a new Google user that needs completion
+        if (req.user && (req.user.isNewGoogleUser || req.user.needsCompletion)) {
+            console.log('➕ New Google user detected - redirecting to complete signup');
             return res.redirect('/auth/google/complete');
         } 
         
         // Existing user - set session and redirect to home
-        if (req.user && req.user._id !== 'temp_google_user') {
+        if (req.user && req.user._id && req.user._id !== 'new_google_signup') {
             console.log('✅ Existing user - setting session and redirecting to home');
             req.session.userId = req.user._id;
             return res.redirect('/home');
         }
 
-        // Fallback
-        console.log('❌ Unexpected state - redirecting to login');
+        // Fallback - something went wrong
+        console.log('❌ Unexpected state in callback - req.user:', req.user);
         res.redirect('/login');
     }
 );
