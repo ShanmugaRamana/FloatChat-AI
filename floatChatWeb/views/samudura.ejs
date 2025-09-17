@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samudura - floatChat</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="welcome-container">
+        <header>
+            <div class="header-title">
+                <h1>Welcome, <%= user.username %>!</h1>
+            </div>
+            <div class="auth-buttons">
+                <form action="/logout" method="POST" style="margin: 0;">
+                    <button type="submit" class="button">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <nav class="main-nav">
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/samudura" class="nav-link active">Samudura</a> </nav>
+
+        <div class="chat-interface-container">
+            <div class="chat-box" id="chat-box">
+                <div class="message bot-message">
+                    <p>Hello! How can I help you with oceanography today? Ask about ARGO floats, salinity profiles, and more.</p>
+                </div>
+            </div>
+            <div class="input-area">
+                <form id="chat-form">
+                    <input type="text" id="user-input" placeholder="e.g., Show me salinity profiles near the equator..." autocomplete="off" required>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

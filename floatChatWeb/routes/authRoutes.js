@@ -28,4 +28,7 @@ router.post('/login', authController.loginUser);
 router.post('/logout', authController.logoutUser);
 router.post('/resend-verification', authController.resendVerification);
 
+router.get('/dashboard', requireLogin, setNoCache, authController.showDashboardPage);
+router.get('/samudura', requireLogin, setNoCache, authController.showSamuduraPage);
+
 module.exports = router;

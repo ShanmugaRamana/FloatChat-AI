@@ -128,3 +128,116 @@ header h1 {
     text-decoration: none;
     font-weight: 600;
 }
+/* ... (keep all existing styles) ... */
+
+/* --- ADD THESE STYLES AT THE END --- */
+
+.main-nav {
+    display: flex;
+    background-color: #f8f9fa;
+    padding: 0 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.nav-link {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: #0077b6;
+    border-bottom: 3px solid #0077b6;
+}
+
+.content-area {
+    padding: 20px;
+}
+/* ... (keep all existing styles) ... */
+
+/* --- ADD THESE STYLES AT THE END --- */
+
+/* Style for the active navigation link */
+.nav-link.active {
+    color: #0077b6;
+    border-bottom: 3px solid #0077b6;
+}
+
+.chat-interface-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allows this container to fill the space */
+    height: 100%; /* Important for flex-grow to work */
+}
+
+.chat-box {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.message {
+    margin-bottom: 15px;
+    max-width: 80%;
+}
+
+.message p {
+    margin: 0;
+    padding: 10px 15px;
+    border-radius: 18px;
+    line-height: 1.4;
+}
+
+.bot-message {
+    align-self: flex-start;
+}
+
+.bot-message p {
+    background-color: #e9ecef;
+    color: #343a40;
+    border-bottom-left-radius: 4px;
+}
+
+.user-message {
+    align-self: flex-end;
+    margin-left: auto; /* Pushes the message to the right */
+}
+
+.user-message p {
+    background-color: #0077b6;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.input-area {
+    border-top: 1px solid #dee2e6;
+    padding: 15px 20px;
+    background-color: #fff;
+}
+
+.input-area form {
+    display: flex;
+}
+
+.input-area input {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+.input-area button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    background-color: #0077b6;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+}

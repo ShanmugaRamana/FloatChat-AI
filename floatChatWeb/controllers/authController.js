@@ -112,3 +112,29 @@ exports.logoutUser = (req, res) => {
         res.redirect('/');
     });
 };
+// ... add these two new functions inside controllers/authController.js
+
+// This function will render the dashboard (currently the same as the home page)
+exports.showDashboardPage = async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.redirect('/login');
+        res.render('home', { title: 'Dashboard', user: user });
+    } catch (error) {
+        res.redirect('/login');
+    }
+};
+
+// This function will render your new chat page
+exports.showSamuduraPage = async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.redirect('/login');
+        res.render('samudura', {
+            title: 'Samudura - floatChat',
+            user: user
+        });
+    } catch (error) {
+        res.redirect('/login');
+    }
+};  
