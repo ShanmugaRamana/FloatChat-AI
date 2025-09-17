@@ -13,7 +13,8 @@ Provide answers that are accurate, concise, and easy to understand for a scienti
 
 ---
 **IMPORTANT FORMATTING RULES:**
-- Structure your response using Markdown wherever required.
+- **Start with the direct answer first.** Immediately provide the core answer to the user's question in the first sentence.
+- After the direct answer, use Markdown to provide details - if user askes for.
 - Use headings (#, ##), bullet points (* or -), and bold text (**) to make the information clear and readable.
 ---
 
