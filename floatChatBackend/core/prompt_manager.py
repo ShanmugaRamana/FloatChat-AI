@@ -5,7 +5,6 @@ def create_prompt(question: str) -> str:
     Creates a structured prompt with system instructions for the LLM.
     """
     
-    # MODIFIED prompt_template
     prompt_template = f"""
 You are an expert oceanography AI assistant named floatChat.
 Your primary function is to answer questions about ocean data, ARGO floats, and related scientific concepts.
