@@ -92,7 +92,7 @@ const errorHandler = (err, req, res, next) => {
 app.use(errorHandler);
 
 // --- 404 Handler ---
-app.use('*', (req, res) => {
+app.use((req, res) => {
     console.log('❌ 404 - Path not found:', req.originalUrl);
     res.status(404).send('Page not found');
 });
