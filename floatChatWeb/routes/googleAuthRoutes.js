@@ -8,32 +8,42 @@ router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']
 }));
 
-// The callback route after Google has authenticated the user
-router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-        console.log('▶️ Google callback executed');
-        console.log('📊 User object:', JSON.stringify(req.user, null, 2));
+// Custom callback route that handles both success and "no user" cases
+router.get('/google/callback', (req, res, next) => {
+    passport.authenticate('google', (err, user, info) => {
+        console.log('▶️ Custom Google callback executed');
+        console.log('📊 Error:', err);
+        console.log('📊 User:', user);
+        console.log('📊 Info:', info);
         console.log('📊 Session pendingGoogleUser:', req.session.pendingGoogleUser);
         
-        // Check if this is a new Google user that needs completion
-        if (req.user && (req.user.isNewGoogleUser || req.user.needsCompletion)) {
-            console.log('➕ New Google user detected - redirecting to complete signup');
-            return res.redirect('/auth/google/complete');
-        } 
-        
-        // Existing user - set session and redirect to home
-        if (req.user && req.user._id && req.user._id !== 'new_google_signup') {
-            console.log('✅ Existing user - setting session and redirecting to home');
-            req.session.userId = req.user._id;
-            return res.redirect('/home');
+        if (err) {
+            console.error('❌ Authentication error:', err);
+            return res.redirect('/login');
         }
-
-        // Fallback - something went wrong
-        console.log('❌ Unexpected state in callback - req.user:', req.user);
-        res.redirect('/login');
-    }
-);
+        
+        if (user) {
+            // Existing user - log them in
+            console.log('✅ Existing user found - logging in');
+            req.logIn(user, (err) => {
+                if (err) {
+                    console.error('❌ Login error:', err);
+                    return res.redirect('/login');
+                }
+                req.session.userId = user._id;
+                return res.redirect('/home');
+            });
+        } else if (req.session.pendingGoogleUser) {
+            // New user - redirect to complete signup
+            console.log('➕ New user with pending data - redirecting to complete');
+            return res.redirect('/auth/google/complete');
+        } else {
+            // Something went wrong
+            console.log('❌ No user and no pending data - redirecting to login');
+            return res.redirect('/login');
+        }
+    })(req, res, next);
+});
 
 // Route to display the password creation page (GET request)
 router.get('/google/complete', (req, res) => {
@@ -69,8 +79,6 @@ router.post('/google/complete', async (req, res) => {
     const { username, email, isVerified } = req.session.pendingGoogleUser;
 
     console.log('📝 Processing Google signup completion for:', email);
-    console.log('Password provided:', !!password);
-    console.log('Confirm password provided:', !!confirmPassword);
 
     // Validation checks
     if (!password || password.trim() === '') {
@@ -89,7 +97,7 @@ router.post('/google/complete', async (req, res) => {
     }
 
     try {
-        // Double-check if user already exists
+        // Check if user already exists
         const existingUser = await User.findOne({ 
             $or: [{ email }, { username }] 
         });
@@ -102,13 +110,13 @@ router.post('/google/complete', async (req, res) => {
             });
         }
 
-        console.log('✅ Creating new user with data:', { username, email, isVerified });
+        console.log('✅ Creating new user:', { username, email, isVerified });
         
         const newUser = new User({ 
             username, 
             email, 
             password, 
-            isVerified: true // Google users are pre-verified
+            isVerified: true
         });
         
         const savedUser = await newUser.save();
@@ -127,18 +135,15 @@ router.post('/google/complete', async (req, res) => {
 
     } catch (error) {
         console.error("❌ Error completing Google signup:", error);
-        console.error("Error details:", error.message);
         
-        // Handle specific MongoDB errors
         if (error.code === 11000) {
-            const field = Object.keys(error.keyPattern)[0];
+            const field = Object.keys(error.keyPattern || {})[0] || 'field';
             return res.render('complete-google-signup', {
                 username, email,
                 error: `A user with that ${field} already exists.`
             });
         }
         
-        // Handle validation errors
         if (error.name === 'ValidationError') {
             const errorMessages = Object.values(error.errors).map(e => e.message);
             return res.render('complete-google-signup', {
@@ -147,7 +152,6 @@ router.post('/google/complete', async (req, res) => {
             });
         }
         
-        // Generic error
         res.render('complete-google-signup', {
             username, email,
             error: 'An error occurred while creating your account. Please try again.'
