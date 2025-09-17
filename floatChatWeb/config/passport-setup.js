@@ -1,4 +1,3 @@
-// config/passport-setup.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
@@ -33,24 +32,23 @@ passport.use(
                 console.log('✅ Existing user found in DB:', user.email);
                 return done(null, user);
             } else {
-                console.log('➕ New user detected. Setting up for signup completion:', profile.emails[0].value);
+                console.log('➕ New user - storing in session:', profile.emails[0].value);
                 
-                // Store Google profile data in session for later use
-                req.session.googleProfile = {
+                // Store the profile in session for new users
+                req.session.pendingGoogleUser = {
                     username: profile.displayName,
                     email: profile.emails[0].value,
-                    isVerified: true // Google users are pre-verified
+                    isVerified: true
+                };
+
+                // Create a temporary user object to satisfy passport
+                const tempUser = {
+                    _id: 'temp_google_user',
+                    isNewGoogleUser: true,
+                    email: profile.emails[0].value
                 };
                 
-                // Save the session before proceeding
-                req.session.save((err) => {
-                    if (err) {
-                        console.error('❌ Session save error:', err);
-                        return done(err, false);
-                    }
-                    console.log('✅ Session saved with Google profile');
-                    return done(null, false, { message: 'COMPLETE_SIGNUP' });
-                });
+                return done(null, tempUser);
             }
         } catch (error) {
             console.error('❌ Error in Google Strategy:', error);

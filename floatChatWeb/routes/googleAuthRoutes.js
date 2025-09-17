@@ -1,4 +1,3 @@
-// routes/googleAuthRoutes.js
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
@@ -13,51 +12,73 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
-        // LOGGING: Check the message from Passport
-        console.log('▶️ Google callback executed. Auth Info:', req.authInfo);
-
-        if (req.authInfo && req.authInfo.message === 'COMPLETE_SIGNUP') {
-            console.log('- - -> Redirecting to /auth/google/complete');
-            res.redirect('/auth/google/complete');
-        } else {
-            console.log('✅ Redirecting to /home');
-            // Set session for existing user
+        console.log('▶️ Google callback executed');
+        console.log('User object:', req.user);
+        
+        // Check if this is a new Google user
+        if (req.user && req.user.isNewGoogleUser) {
+            console.log('➕ New Google user - redirecting to complete signup');
+            return res.redirect('/auth/google/complete');
+        } 
+        
+        // Existing user - set session and redirect to home
+        if (req.user && req.user._id !== 'temp_google_user') {
+            console.log('✅ Existing user - setting session and redirecting to home');
             req.session.userId = req.user._id;
-            res.redirect('/home');
+            return res.redirect('/home');
         }
+
+        // Fallback
+        console.log('❌ Unexpected state - redirecting to login');
+        res.redirect('/login');
     }
 );
 
 // Route to display the password creation page (GET request)
 router.get('/google/complete', (req, res) => {
-    if (!req.session.googleProfile) {
-        console.log('❌ No Google profile in session, redirecting to signup');
+    console.log('📄 GET /auth/google/complete called');
+    console.log('Session pendingGoogleUser:', req.session.pendingGoogleUser);
+    
+    if (!req.session.pendingGoogleUser) {
+        console.log('❌ No pending Google user in session');
         return res.redirect('/signup');
     }
 
-    const { username, email } = req.session.googleProfile;
+    const { username, email } = req.session.pendingGoogleUser;
     console.log('✅ Rendering complete-google-signup page for:', email);
     
     res.render('complete-google-signup', {
         username, 
         email,
-        error: null // No error initially
+        error: null
     });
 });
 
 // Route to handle the password creation form submission (POST request)
 router.post('/google/complete', async (req, res) => {
-    if (!req.session.googleProfile) {
-        console.log('❌ No Google profile in session during POST');
+    console.log('📝 POST /auth/google/complete called');
+    console.log('Session pendingGoogleUser:', req.session.pendingGoogleUser);
+    
+    if (!req.session.pendingGoogleUser) {
+        console.log('❌ No pending Google user in session during POST');
         return res.redirect('/signup');
     }
 
     const { password, 'confirm-password': confirmPassword } = req.body;
-    const { username, email, isVerified } = req.session.googleProfile;
+    const { username, email, isVerified } = req.session.pendingGoogleUser;
 
     console.log('📝 Processing Google signup completion for:', email);
+    console.log('Password provided:', !!password);
+    console.log('Confirm password provided:', !!confirmPassword);
 
-    // 1. Add password confirmation check
+    // Validation checks
+    if (!password || password.trim() === '') {
+        return res.render('complete-google-signup', {
+            username, email,
+            error: 'Password is required.'
+        });
+    }
+
     if (password !== confirmPassword) {
         console.log('❌ Password mismatch');
         return res.render('complete-google-signup', {
@@ -66,16 +87,8 @@ router.post('/google/complete', async (req, res) => {
         });
     }
 
-    // 2. Check if password is provided
-    if (!password || password.trim() === '') {
-        return res.render('complete-google-signup', {
-            username, email,
-            error: 'Password is required.'
-        });
-    }
-
     try {
-        // 3. Check if user already exists (additional safety check)
+        // Double-check if user already exists
         const existingUser = await User.findOne({ 
             $or: [{ email }, { username }] 
         });
@@ -88,47 +101,52 @@ router.post('/google/complete', async (req, res) => {
             });
         }
 
-        console.log('✅ Creating new user:', email);
+        console.log('✅ Creating new user with data:', { username, email, isVerified });
+        
         const newUser = new User({ 
             username, 
             email, 
             password, 
-            isVerified // This should be true from Google auth
+            isVerified: true // Google users are pre-verified
         });
         
-        await newUser.save();
-        console.log('✅ User saved successfully:', newUser._id);
+        const savedUser = await newUser.save();
+        console.log('✅ User saved successfully with ID:', savedUser._id);
 
-        // Clear the Google profile from session
-        req.session.googleProfile = null;
-
-        // Set the user session
-        req.session.userId = newUser._id;
+        // Clear the pending Google user from session
+        delete req.session.pendingGoogleUser;
         
+        // Set the regular user session
+        req.session.userId = savedUser._id;
+        
+        console.log('✅ Session userId set to:', req.session.userId);
         console.log('✅ Redirecting to home');
+        
         res.redirect('/home');
 
     } catch (error) {
         console.error("❌ Error completing Google signup:", error);
+        console.error("Error details:", error.message);
         
         // Handle specific MongoDB errors
         if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
             return res.render('complete-google-signup', {
                 username, email,
-                error: 'A user with that email or username already exists.'
+                error: `A user with that ${field} already exists.`
             });
         }
         
-        // For validation errors
+        // Handle validation errors
         if (error.name === 'ValidationError') {
-            const errorMessage = Object.values(error.errors).map(e => e.message).join(', ');
+            const errorMessages = Object.values(error.errors).map(e => e.message);
             return res.render('complete-google-signup', {
                 username, email,
-                error: `Validation error: ${errorMessage}`
+                error: `Validation error: ${errorMessages.join(', ')}`
             });
         }
         
-        // For any other errors
+        // Generic error
         res.render('complete-google-signup', {
             username, email,
             error: 'An error occurred while creating your account. Please try again.'
