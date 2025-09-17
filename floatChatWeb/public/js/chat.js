@@ -6,42 +6,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chat-box');
 
     chatForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent the form from reloading the page
+        event.preventDefault();
 
         const question = userInput.value.trim();
         if (!question) return;
 
-        // Display the user's message
         appendMessage(question, 'user-message');
-        userInput.value = ''; // Clear the input field
+        userInput.value = '';
 
-        // Show a "thinking" indicator for the bot
-        const thinkingMessage = appendMessage('...', 'bot-message thinking');
+        // NEW: Show the typing animation
+        const loadingIndicator = showLoadingIndicator();
 
         try {
-            // Send the question to the backend API
             const response = await fetch(`${BACKEND_URL}/api/query`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question: question }),
             });
 
+            // NEW: Improved error handling
             if (!response.ok) {
-                throw new Error(`API error: ${response.statusText}`);
+                const errorData = await response.json().catch(() => ({ detail: 'An unknown error occurred.' }));
+                const errorMessage = `Error: ${response.status} - ${errorData.detail || response.statusText}`;
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
-
-            // Replace "thinking" message with the actual response
-            thinkingMessage.querySelector('p').textContent = data.answer;
-            thinkingMessage.classList.remove('thinking');
+            
+            // Remove the loading indicator and display the real message
+            loadingIndicator.remove();
+            appendMessage(data.answer, 'bot-message');
 
         } catch (error) {
             console.error('Error fetching bot response:', error);
-            thinkingMessage.querySelector('p').textContent = 'Sorry, I am having trouble connecting to my brain right now. Please try again later.';
-            thinkingMessage.classList.remove('thinking');
+            // Remove the loading indicator and show an error message in the chat
+            loadingIndicator.remove();
+            appendMessage(error.message, 'bot-message error-message');
         }
     });
 
@@ -54,9 +54,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messageDiv.appendChild(messageP);
         chatBox.appendChild(messageDiv);
-
-        // Scroll to the bottom of the chat box
-        chatBox.scrollTop = chatBox.scrollHeight;
+        scrollToBottom();
         return messageDiv;
+    }
+
+    // NEW: Function to create and show the loading animation
+    function showLoadingIndicator() {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'bot-message');
+
+        const indicatorDiv = document.createElement('div');
+        indicatorDiv.classList.add('typing-indicator');
+        indicatorDiv.innerHTML = '<span></span><span></span><span></span>';
+
+        messageDiv.appendChild(indicatorDiv);
+        chatBox.appendChild(messageDiv);
+        scrollToBottom();
+        return messageDiv;
+    }
+
+    function scrollToBottom() {
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 });

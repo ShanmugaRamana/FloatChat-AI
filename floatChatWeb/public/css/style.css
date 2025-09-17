@@ -254,3 +254,36 @@ header h1 {
     50% { opacity: 1; }
     100% { opacity: 0.5; }
 }
+/* public/css/style.css */
+/* --- ADD THESE STYLES AT THE END --- */
+
+/* Typing indicator animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    background-color: #999;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 2px;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+/* Error message styling */
+.error-message p {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+}
