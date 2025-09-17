@@ -27,7 +27,7 @@ exports.signupUser = async (req, res) => {
         const user = new User({ username, email, password, verificationToken });
         await user.save();
 
-        const verificationURL = `http://localhost:3000/verify-email?token=${verificationToken}`;
+        const verificationURL = `https://floatai.onrender.com/verify-email?token=${verificationToken}`;
         const message = `<p>Please verify your email by clicking this link: <a href="${verificationURL}">Verify Account</a></p>`;
 
         await sendEmail({
