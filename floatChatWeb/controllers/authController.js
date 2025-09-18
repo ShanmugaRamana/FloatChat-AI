@@ -131,8 +131,8 @@ exports.showSamuduraPage = async (req, res) => {
         const user = await User.findById(req.session.userId);
         if (!user) return res.redirect('/login');
         res.render('samudura', {
-            title: 'Samudura - floatChat',
-            user: user,
+            title: 'Samudra - FloatChat', 
+            user: user, 
             backendApiUrl: process.env.BACKEND_API_URL 
 
         });
